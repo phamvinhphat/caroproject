@@ -17,18 +17,25 @@ public class caro {
 	static byte chon;
 	static String a[][] = new String[row][column];
 	
-	
 	/*
-	 * ban co 
+	 * lap ban co
 	 */
 	public static void create_board() {
-		for (int i = 0; i < row; i++) {
-			for (int j = 0; j < column; j++) {
-				a[i][j] = "-";
+		for(int i = 0; i < row; i++) {
+			for(int j = 0; j < column; j++) {
+				if(i == 0 || i % 2 == 0 ) {
+					a[i][j] = "_";					
+				}
+				if(a[i][j] == null) {
+					a[i][j] = " ";
+				}
 			}
 		}
 	}
+	
+	
 
+	
 	
 	/*
 	 * xuat ban co 5x5
@@ -36,9 +43,9 @@ public class caro {
 	public static void output() {
 		for (int i = 0; i < row; i++) {
 			for (int j = 0; j < column; j++) {
-				System.out.print(" " + a[i][j]);
+				System.out.print(a[i][j] +"|");
 			}
-			System.out.println("\n");
+			System.out.print("\n");
 		}
 	}
 	
@@ -54,14 +61,12 @@ public class caro {
 	/*
 	 * Kiem tra dieu kien de duy chuyen cua ban co
 	 */
-	public static boolean is_legal_move(int row2, int column2, String n) {
-		if (row2 < row && column2 < column ) {
-				if( n.equalsIgnoreCase("X") || n.equalsIgnoreCase("O") ) {
-					if (a[row2][column2] == "-") {
+	public static boolean is_legal_move(int row2, int column2) {
+		if (row2 < row && column2 < column || row2 != 0 ) {
+					if (a[row2][column2] == " ") {
 							return true;
 					}
 				}
-		}
 		return false;
 	}
 
@@ -71,7 +76,7 @@ public class caro {
 	 *
 	 */
 	public static void make_move(int row, int column, String n) {
-		boolean bl = is_legal_move(row, column,n);
+		boolean bl = is_legal_move(row, column);
 		if (bl == true) {
 			System.out.print("\ndi chuyen hop phap \n");
 			inputCaro(row, column, n);
@@ -79,6 +84,10 @@ public class caro {
 			System.out.println("\nSau khi di chuyen \n ");
 			output();
 			System.out.println("\n---------------");
+			 if( checkWin(row, column) == true ) {
+				 System.out.println("Thang");
+				 chon = 0;
+			 }
 		} else {
 			System.out.print("\n!!!! di chuyen (Ten) khong hop phap !!!!\n");
 			System.out.println("\n---------------");
@@ -98,10 +107,10 @@ public class caro {
 		do {	
 				int value  = rd.nextInt(row);
 				int value2 = rd.nextInt(column);
-				if (a[value][value2] == "-") {
+				if (a[value][value2] == " ") {
 						inputCaro(value,value2,"O");
 						if(checkWin(value, value2) == true) {
-							System.out.println("O Thang");
+							System.out.println("Thang");
 							chon = 0; 
 						}
 						return true;
@@ -128,13 +137,17 @@ public class caro {
 	 * xuat cac buoc duy chuyen
 	 */
 	public static void make_move_auto(int row, int column, String n) {
-		boolean bl = is_legal_move(row, column,n);
+		boolean bl = is_legal_move(row, column);
 		if (bl == true) {
 			System.out.print("\ndi chuyen hop phap \n");
 			inputCaro(row, column, n);
 			System.out.println("\n---------------");
 			System.out.println("\nX Sau khi di chuyen \n ");
 			output();
+			if( checkWin(row, column) == true) {
+				System.out.println("X thang ");
+				chon = 0;
+			}
 			System.out.println("\n---------------");
 			make_moveO();
 		} else {
@@ -147,36 +160,38 @@ public class caro {
 	
 	public static boolean checkWin(int i, int j)  {
 		if(i < row && j < column) {
+			
 			// so cot 
-			int check_column = 0, transfer_column = i ;
-			while (transfer_column < column && a[transfer_column][j].equalsIgnoreCase(a[i][j]) ) {
-				check_column++;
-				transfer_column++;
+			int check_column = 0, transfer_row = i ;
+			while (transfer_row < column && a[transfer_row][j].equalsIgnoreCase(a[i][j]) ) {
+				check_column ++ ;
+				transfer_row = transfer_row + 2;
 			}
 			
-			transfer_column = i-1;
+			transfer_row = i - 2;
 		
-			while(transfer_column >= 0 && a[transfer_column][j].equalsIgnoreCase(a[i][j]) ) {
-				check_column++;
-				transfer_column--;
+			while(  transfer_row >= 0 && a[transfer_row][j].equalsIgnoreCase(a[i][j]) ) {
+				check_column ++ ;
+				transfer_row = transfer_row - 2; 
 			}
 			
 			if(check_column > 4 ) {
 				return true;
 			}
 			
+			
 			// so hang
-			int check_row = 0, transfer_row = j;
-			while(transfer_row < row && a[i][transfer_row].equalsIgnoreCase(a[i][j])) {
-				check_row++;
-				transfer_row++;
+			int check_row = 0, transfer_column = j;
+			while(transfer_column < row && a[i][transfer_column].equalsIgnoreCase(a[i][j])) {
+				check_row ++ ;
+				transfer_column ++ ;
 			}
 			
-			transfer_row = j-1;
+			transfer_column = j - 1; 
 			
-			while(transfer_row >= 0 && a[i][transfer_row].equalsIgnoreCase(a[i][j]) ) {
-				check_row++;
-				transfer_row--;
+			while(transfer_column >= 0 && a[i][transfer_column].equalsIgnoreCase(a[i][j]) ) {
+				check_row ++ ;
+				transfer_column -- ;
 			}
 			
 			if(check_row > 4) {
@@ -188,56 +203,56 @@ public class caro {
 			int transfer_row_1 = i , transfer_column_1 = j, check_ringht_diagonal = 0;
 			while(transfer_row_1 < row && transfer_column_1 < column
 					&& a[transfer_row_1][transfer_column_1].equalsIgnoreCase(a[i][j]) ) {
-				check_ringht_diagonal++;
-				transfer_row_1++;
-				transfer_column_1++;
+				
+				check_ringht_diagonal ++ ;
+				transfer_row_1 ++ ;
+				transfer_column_1 = transfer_column_1 + 2 ;
+				
 			}
 			
-			transfer_row_1 = i-1;
-			transfer_column_1 = j-1;
+			transfer_row_1 = i - 2;
+			transfer_column_1 = j - 1;
 			
 			while(transfer_row_1 >= 0 && transfer_column_1 >= 0 
 					&& a[transfer_row_1][transfer_column_1].equalsIgnoreCase(a[i][j]) ) {
-				check_ringht_diagonal++;
-				transfer_row_1--;
-				transfer_column_1--;
+				
+				check_ringht_diagonal ++ ;
+				transfer_row_1 = transfer_row_1 - 2 ;
+				transfer_column_1 -- ;
 			}
 			
 			if(check_ringht_diagonal > 4) {
 				return true;
 			}
+	
 			
 			// dương chéo dau sat
-			//transfer_row_2 >= 0 &&
 			int transfer_row_2 = i, transfer_column_2 = j, check_left_diagonal = 0;
 			while(transfer_column_2 >= 0 && transfer_row_2 < row 
 					&& transfer_column < column 
 					&& a[transfer_row_2][transfer_column_2].equalsIgnoreCase(a[i][j]) ) {
 				
-				check_left_diagonal++;
-				transfer_row_2++;				
+				check_left_diagonal++;				
+				transfer_row_2 = transfer_row_2 + 2;
 				transfer_column_2--;
-				
 			}
 			
-			transfer_row_2 = i-1;
-			transfer_column_2 = j+1; 
+			transfer_row_2 = i - 2;
+			transfer_column_2 = j + 1; 
 			
 			while(transfer_row_2 < row && transfer_column_2 < column
 					&& transfer_row_2 >= 0 
 					&& a[transfer_row_2][transfer_column_2].equalsIgnoreCase(a[i][j])) {
 				
 				check_left_diagonal++;
-				transfer_row_2--;
+				transfer_row_2 = transfer_row_2 - 2;
 				transfer_column_2++;
-				
 			}
+			
 			if(check_left_diagonal > 4) {
 				return true;
 			}
 		}	
-	
-	//	System.out.println("false");
 		return false;
 	}
 	
@@ -245,6 +260,11 @@ public class caro {
 
 	public static void main(String args[]) throws UnsupportedEncodingException {
 		Scanner sc = new Scanner(System.in);
+//		
+//		create_board();
+//		create_board();
+//		output();
+		int change = 1;
 		
 		do {
 			System.out.println("=========CO CARO========");
@@ -272,20 +292,19 @@ public class caro {
 							int sh = sc.nextInt();
 							System.out.print("So cot : ");
 							int soc = sc.nextInt();
-							System.out.print("Nhap ten : ");
-							
-							sc.nextLine();
-							String w = sc.nextLine();
 							System.out.println("\n---------------");
 							System.out.print("\nKIEM TRA : ");
-							make_move(sh, soc, w);
-							
-						
-							if(checkWin(sh,soc) == true) {
-								System.out.print(" thang  ");
-									chon = 0 ;
+							if(is_legal_move(sh,soc) == true) {
+								if(change % 2 != 0) {
+									make_move(sh, soc, "X");
+									change ++ ;
+								} else {
+									make_move(sh, soc, "O");
+									change ++ ;
+								}
+							} else {
+								System.out.println("!!! LOI SAI DO HANG VA COT KHONG DUNG !!!");
 							}
-							
 							break;
 			
 						default:
@@ -310,17 +329,14 @@ public class caro {
 					case 2:
 						System.out.println("\n---------------");
 						System.out.print("\nNhap so hang X :");
-						int sh = sc.nextInt();
+						int sh1 = sc.nextInt();
 						System.out.print("So cot  X : ");
-						int soc = sc.nextInt();
+						int soc1 = sc.nextInt();
 						System.out.println("\n---------------");
 						System.out.print("\nKIEM TRA : ");
-						make_move_auto(sh, soc, "X");
+						make_move_auto(sh1, soc1, "X");
 						
-						if( checkWin(sh,soc) == true ) {
-							System.out.print(" X thang  ");
-								chon = 0 ;
-						}
+
 						
 						break;
 		
